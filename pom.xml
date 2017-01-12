@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.jasonwjones.hyperion</groupId>
 	<artifactId>hyperion-parent-inferrer</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<name>Hyperion Parent Inferrer</name>
 	<url>http://www.jasonwjones.com/projects/hyperion-parent-inferrer/</url>
 

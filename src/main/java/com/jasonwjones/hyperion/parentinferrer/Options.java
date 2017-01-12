@@ -1,5 +1,12 @@
 package com.jasonwjones.hyperion.parentinferrer;
 
+/**
+ * Models the main options that affect the execution of the parent inferrer
+ * program.
+ * 
+ * @author jasonwjones
+ *
+ */
 public interface Options {
 
 	/**
@@ -17,6 +24,20 @@ public interface Options {
 	 * 
 	 * @return true if allowed, false otherwise
 	 */
-	boolean allowOveradvancedLevels();
+	public boolean allowOveradvancedLevels();
+
+	/**
+	 * The character that is used to indicate a hierarchical relationship.
+	 * 
+	 * @return the indent character
+	 */
+	public char getIndentCharacter();
+
+	/**
+	 * The text that should be rendered if there is no parent
+	 * 
+	 * @return text to use for no parent
+	 */
+	public String getNoParentText();
 
 }

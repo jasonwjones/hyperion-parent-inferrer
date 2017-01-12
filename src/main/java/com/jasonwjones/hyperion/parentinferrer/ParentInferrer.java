@@ -13,34 +13,53 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
 
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
+
 public class ParentInferrer {
 
 	private ParentLevels parentLevels = new ParentLevels();
+	
 	private int currentLevel = -1;
 
-	// private Options options = new BasicOptions();
-
+	private Options options = new BasicOptions();
+	
 	public static void main(String[] args) throws Exception {
-		if (args.length == 0) {
-			usage();
+		Command command = new Command();
+		JCommander commander = new JCommander(command);
+		
+		try {
+			commander.parse(args);
+		} catch (ParameterException e) {
+			commander.usage();
 			System.exit(1);
 		}
-
+		
 		InputStream inputStream = null;
 		try {
-			inputStream = new FileInputStream(args[0]);
+			inputStream = new FileInputStream(command.getInputFile());
 		} catch (FileNotFoundException e1) {
 			System.err.println("Input file not found.");
 			System.exit(1);
 		}
 
-		ParentInferrer pi = new ParentInferrer();
+		BasicOptions options = new BasicOptions();
+		if (command.getIndentCharacter() != null && command.getIndentCharacter().length() > 0) {
+			if (command.getIndentCharacter().equals("tab")) {
+				options.setIndentCharacter('\t');
+			} else {
+				options.setIndentCharacter(command.getIndentCharacter().charAt(0));
+			}
+		}
+		options.setNoParentText(command.getNoParentText());
+		
+		ParentInferrer pi = new ParentInferrer(options);
 
 		try {
-			if (args.length == 1) {
+			if (command.getOutputFile() == null) {
 				pi.process(inputStream); // if only one arg, use stdout
 			} else {
-				pi.process(inputStream, new FileOutputStream(args[1]));
+				pi.process(inputStream, new FileOutputStream(command.getOutputFile()));
 			}
 		} catch (Exception e) {
 			System.err.println("There was an error during processing: " + e.getMessage());
@@ -50,10 +69,10 @@ public class ParentInferrer {
 		}
 	}
 
-	private static void usage() {
-		System.out.println("Usage:");
+	public ParentInferrer(Options options) {
+		this.options = options;
 	}
-
+	
 	public void reset() {
 		currentLevel = -1;
 		parentLevels = new ParentLevels();
@@ -77,16 +96,17 @@ public class ParentInferrer {
 
 		try {
 			for (String line = bufferedReader.readLine(); line != null; line = bufferedReader.readLine()) {
-				int level = lengthOfPrefix(line);
-				String member = textWithoutPrefix(line);
+				int level = lengthOfPrefix(line, options.getIndentCharacter());
+				String member = textWithoutPrefix(line, options.getIndentCharacter());
 
 				if (isLevelAcceptable(level)) {
 					currentLevel = level;
 					parentLevels.setParentForLevel(member, level);
 					String parent = parentLevels.getParentForLevel(level - 1);
-					printWriter.printf("%s,%s%n", parent, member);
+					printWriter.printf("%s,%s%n", parent == null ? options.getNoParentText() : parent, member);
 				} else {
-					System.err.printf("Level of processed member %s is invalid: %d (currentLevel = %d)%n", member, level, currentLevel);
+					System.err.printf("Level of processed member %s is invalid: %d (currentLevel = %d)%n", member,
+							level, currentLevel);
 				}
 			}
 		} finally {
@@ -108,10 +128,6 @@ public class ParentInferrer {
 		return level <= currentLevel + 1;
 	}
 
-	public static int lengthOfPrefix(String text) {
-		return lengthOfPrefix(text, ' ');
-	}
-
 	public static int lengthOfPrefix(String text, char prefixChar) {
 		StringBuilder sb = new StringBuilder();
 		for (int index = 0; index < text.length(); index++) {
@@ -123,12 +139,8 @@ public class ParentInferrer {
 		return text.length();
 	}
 
-	public static String textWithoutPrefix(String text) {
-		return text.substring(lengthOfPrefix(text));
-	}
-
 	public static String textWithoutPrefix(String text, char prefixChar) {
-		return text.substring(lengthOfPrefix(text), prefixChar);
+		return text.substring(lengthOfPrefix(text, prefixChar));
 	}
 
 }
