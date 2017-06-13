@@ -40,4 +40,12 @@ public interface Options {
 	 */
 	public String getNoParentText();
 
+	/**
+	 * Whether to create entries in the parent to child mapping when they do not
+	 * have children. By defauly, entries will not be created.
+	 * 
+	 * @return true if entries should be created, false otherwise
+	 */
+	public boolean isCreateEntriesForChildless();
+
 }

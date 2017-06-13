@@ -12,6 +12,8 @@ public class BasicOptions implements Options {
 
 	private String noParentText = "null";
 	
+	private boolean createEntriesForChildless = false;
+	
 	public static final char DEFAULT_INDENT_CHARACTER = ' ';
 
 	public boolean allowOveradvancedLevels() {
@@ -34,6 +36,15 @@ public class BasicOptions implements Options {
 
 	public void setNoParentText(String noParentText) {
 		this.noParentText = noParentText;
+	}
+
+	@Override
+	public boolean isCreateEntriesForChildless() {
+		return createEntriesForChildless;
+	}
+
+	public void setCreateEntriesForChildless(boolean createEntriesForChildless) {
+		this.createEntriesForChildless = createEntriesForChildless;
 	}
 
 }
