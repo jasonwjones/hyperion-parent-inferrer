@@ -79,8 +79,27 @@ If embedding into a Java solution, you can call the code simply as follows:
 		
 There are also convenience variants of `process()` that take an `InputStream` or a `Reader` in addition to a filename.
 
+You may also wish to get a simple `Map` structure that gives you the ability to look up the children of a given entry. 
+This is possible with the `processString(String text)` method:
+
+	String hier = "Time\n Qtr1\n Qtr2\n  Jan\n  Feb\n  Mar\n";
+	BasicOptions options = new BasicOptions();
+	options.setCreateEntriesForChildless(true);
+	ParentInferrer pi = new ParentInferrer(options);
+		
+	Map<String, List<String>> children = pi.processString(hier);
+
+You can then quickly get the children of the `Qtr1` member:
+
+	List<String> qtr1Months = children.get("Qtr1");
+
 
 ## History
+
+1.0.2
+
+ * New `processString()`  method to process text hierarchy into a simple `Map<String, List<String>>` of parents to children
+ * New option for previous method so that childless entries can be counted or not
 
 1.0.1
  
@@ -91,6 +110,7 @@ There are also convenience variants of `process()` that take an `InputStream` or
 1.0.0
 
  * Initial release
+
 
 ## License
 
